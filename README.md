@@ -3,8 +3,7 @@
 Este é o Repositório para controle de Código do projeto Arcaz.
 Projeto original: [https://github.com/omeka/Omeka](https://github.com/omeka/Omeka)
 
-Não foi feito um fork do projeto original, pois o objetivo não é criar um projeto 
-similar. Apenas garantir um versionamento, caso alguma alteração específicano código seja feita.
+Não foi feito um fork do projeto original, pois o objetivo é garantir um controle das alterações, sem criar um projeto similar.
 
 # Texto Original
 Disponível no README.md do Omeka
