@@ -1,4 +1,6 @@
-# REA - Arcaz
+# Arcaz
+## REA
+### Recursos Educacionais Abertos
 
 Este é o Repositório para controle de Código do projeto Arcaz.
 Projeto original: [https://github.com/omeka/Omeka](https://github.com/omeka/Omeka)
