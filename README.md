@@ -7,7 +7,7 @@ Projeto original: [https://github.com/omeka/Omeka](https://github.com/omeka/Omek
 
 Não foi feito um fork do projeto original, pois o objetivo é garantir um controle das alterações, sem criar um projeto similar.
 
-### Texto Original
+#### Texto Original
 Disponível no README.md do Omeka
 
 &copy; 2008-2015 [Roy Rosenzweig Center for History and New Media](http://chnm.gmu.edu/)
