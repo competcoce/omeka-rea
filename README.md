@@ -2,7 +2,7 @@
 
 ### REA - Recursos Educacionais Abertos
 
-Este é o Repositório para controle de Código do projeto Arcaz - UTFPR.
+Este é o Repositório para controle de Código do projeto Arcaz - UTFPR - 2015.
 Projeto original: [https://github.com/omeka/Omeka](https://github.com/omeka/Omeka)
 
 Não foi feito um fork do projeto original, pois o objetivo é garantir um controle das alterações, sem criar um projeto similar.
