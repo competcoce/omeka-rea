@@ -1,16 +1,6 @@
-# Arcaz
+# Welcome to Omeka
 
-### REA - Recursos Educacionais Abertos
-
-Este é o Repositório para controle de Código do projeto Arcaz.
-Projeto original: [https://github.com/omeka/Omeka](https://github.com/omeka/Omeka)
-
-Não foi feito um fork do projeto original, pois o objetivo é garantir um controle das alterações, sem criar um projeto similar.
-
-#### Texto Original
-Disponível no README.md do Omeka
-
-&copy; 2008-2015 [Roy Rosenzweig Center for History and New Media](http://chnm.gmu.edu/)
+&copy; 2008-2012 [Roy Rosenzweig Center for History and New Media](http://chnm.gmu.edu/)
 
 This program is free software: you can redistribute it and/or modify it under 
 the terms of the GNU General Public License as published by the Free Software 

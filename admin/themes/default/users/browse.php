@@ -8,13 +8,44 @@ echo flash();
     <?php echo link_to('users', 'add', __('Add a User'), array('class'=>'small green button')); ?>
 <?php endif; ?>
 
+<?php if(isset($_GET['search'])):?>
+<div id='search-filters'>
+    <ul>
+        <li>
+        <?php switch($_GET['search-type']) {
+                        case "name":
+                            echo __("Name") . ': ';
+                        break;
+                        case "username":
+                            echo __("Username") . ': ';
+                        break;
+                        case "email":
+                            echo __("Email") . ': ';
+                        break;
+                    }
+        ?>
+        <?php echo html_escape($_GET['search']); ?>
+        </li>
+    </ul>
+
+</div>
+<?php endif; ?>
+
+<form id='search-users' method='GET'>
+<button><?php echo __('Search users'); ?></button><input type='text' name='search'/>
+<input type='radio' name='search-type' value='username' checked='checked' /><span><?php echo __('Username'); ?></span>
+<input type='radio' name='search-type' value='name' /><span><?php echo __('Display Name'); ?></span>
+<input type='radio' name='search-type' value='email' /><span><?php echo __('Email'); ?></span>
+
+</form>
+
 <?php echo pagination_links(); ?>
 <table id="users">
     <thead>
         <tr>
         <?php $sortLinks = array(
                 __('Username') => 'username',
-                __('Real Name') => 'name',
+                __('Display Name') => 'name',
                 __('Email') => 'email',
                 __('Role') => 'role'
                 );

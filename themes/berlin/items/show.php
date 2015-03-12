@@ -2,21 +2,6 @@
 <div id="primary">
     <h1><?php echo metadata('item', array('Dublin Core','Title')); ?></h1>
 
-    <?php
-    $titles = metadata('item',array('Dublin Core','Title'),array('all'));
-
-    if(count($titles) > 1):
-    ?>
-    <h3><?php echo __('All Titles'); ?></h3>
-    <ul class="title-list">
-        <?php foreach($titles as $title): ?>
-            <li class="item-title">
-                <?php echo $title; ?>
-            </li>
-        <?php endforeach; ?>
-    </ul>
-    <?php endif; ?>
-
     <!-- Items metadata -->
     <div id="item-metadata">
         <?php echo all_element_texts('item'); ?>
@@ -30,7 +15,7 @@
    <?php if(metadata('item','Collection Name')): ?>
       <div id="collection" class="element">
         <h3><?php echo __('Collection'); ?></h3>
-        <div class="element-text"><p><?php echo link_to_collection_for_item(); ?></p></div>
+        <div class="element-text"><?php echo link_to_collection_for_item(); ?></div>
       </div>
    <?php endif; ?>
 
