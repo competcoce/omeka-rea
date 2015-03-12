@@ -43,7 +43,7 @@ class YoutubeImport_ImportHelper
     return($videoID);
   }
 
-  private function _addPlayerElement() {
+  private static function _addPlayerElement() {
       if(element_exists(ElementSet::ITEM_TYPE_NAME,'Player'))
           return;
 
@@ -181,7 +181,7 @@ class YoutubeImport_ImportHelper
       }
 
     if(!element_exists(ElementSet::ITEM_TYPE_NAME,'Player'))
-        $this->_addPlayerElement();
+        static::_addPlayerElement();//$this->_addPlayerElement();
 //      throw new Exception('Metadata element missing for embedded video html');
 
     $playerHtml = str_replace('/>','></iframe>',$video['player']['embedHtml']);
