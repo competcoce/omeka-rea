@@ -12,45 +12,6 @@
 class Table_Item extends Omeka_Db_Table
 {
     /**
-     * Can specify a range of valid Item IDs or an individual ID
-     *
-     * @param Omeka_Db_Select $select
-     * @param string $range Example: 1-4, 75, 89
-     * @return void
-     */
-    public function filterByRange($select, $range)
-    {
-        // Comma-separated expressions should be treated individually
-        $exprs = explode(',', $range);
-
-        // Construct a SQL clause where every entry in this array is linked by 'OR'
-        $wheres = array();
-
-        foreach ($exprs as $expr) {
-            // If it has a '-' in it, it is a range of item IDs.  Otherwise it is
-            // a single item ID
-            if (strpos($expr, '-') !== false) {
-                list($start, $finish) = explode('-', $expr);
-
-                // Naughty naughty koolaid, no SQL injection for you
-                $start  = (int) trim($start);
-                $finish = (int) trim($finish);
-
-                $wheres[] = "(items.id BETWEEN $start AND $finish)";
-
-                //It is a single item ID
-            } else {
-                $id = (int) trim($expr);
-                $wheres[] = "(items.id = $id)";
-            }
-        }
-
-        $where = join(' OR ', $wheres);
-
-        $select->where('('.$where.')');
-    }
-
-    /**
      * Run the search filter on the SELECT statement
      *
      * @param Zend_Db_Select
@@ -111,7 +72,7 @@ class Table_Item extends Omeka_Db_Table
             array()
         );
 
-        $whereCondition = $db->quoteInto('_simple_etx.text LIKE ?', $terms)
+        $whereCondition = $db->quoteInto('_simple_etx.text LIKE ?', '%' . $terms . '%')
                         . ' OR '
                         . $db->quoteInto('_simple_tags.name IN (?)', $tagList);
         $select->where($whereCondition);
@@ -134,21 +95,24 @@ class Table_Item extends Omeka_Db_Table
                 continue;
             }
             
-            $value = $v['terms'];
+            $value = isset($v['terms']) ? $v['terms'] : null;
             $type = $v['type'];
             $elementId = (int) $v['element_id'];
 
             $inner = true;
+            $orCondition = '';
             // Determine what the WHERE clause should look like.
             switch ($type) {
-                case 'does not contain':
-                    $predicate = "LIKE " . $db->quote('%'.$value .'%');
-                    break;
                 case 'contains':
                     $predicate = "LIKE " . $db->quote('%'.$value .'%');
                     break;
                 case 'is exactly':
                     $predicate = ' = ' . $db->quote($value);
+                    break;
+                case 'does not contain':
+                    $inner = false;
+                    $predicate = "NOT LIKE " . $db->quote('%' . $value .'%');
+                    $orCondition = 'IS NULL';
                     break;
                 case 'is empty':
                     $inner = false;
@@ -160,7 +124,7 @@ class Table_Item extends Omeka_Db_Table
                 default:
                     throw new Omeka_Record_Exception(__('Invalid search type given!'));
             }
-            
+
             $alias = "_advanced_{$advancedIndex}";
 
             // Note that $elementId was earlier forced to int, so manual quoting
@@ -171,39 +135,13 @@ class Table_Item extends Omeka_Db_Table
             } else {
                 $select->joinLeft(array($alias => $db->ElementText), $joinCondition, array());
             }
-            $select->where("{$alias}.text {$predicate}");
+            $orCondition = empty($orCondition) ? '' : " OR {$alias}.text {$orCondition}";
+            $select->where("{$alias}.text {$predicate}{$orCondition}");
 
             $advancedIndex++;
         }
     }
-
-    /**
-     * Apply a filter to the items based on whether or not they should be public
-     *
-     * @param Zend_Db_Select
-     * @param boolean Whether or not to retrieve only public items
-     * @return void
-     */
-    public function filterByPublic($select, $isPublic)
-    {
-        //Force a preview of the public items
-        if ($isPublic) {
-            $select->where('items.public = 1');
-        } else {
-            $select->where('items.public = 0');
-        }
-    }
-
-    public function filterByFeatured($select, $isFeatured)
-    {
-        //filter items based on featured (only value of 'true' will return featured items)
-        if ($isFeatured) {
-            $select->where('items.featured = 1');
-        } else {
-            $select->where('items.featured = 0');
-        }
-    }
-
+    
     /**
      * Filter the SELECT statement based on an item's collection
      *
@@ -298,18 +236,6 @@ class Table_Item extends Omeka_Db_Table
     }
 
     /**
-     * Filter the SELECT based on the user who owns the item
-     *
-     * @param Zend_Db_Select
-     * @param integer $userId  ID of the User to filter by
-     * @return void
-     */
-    public function filterByUser($select, $userId, $isUser=true)
-    {
-        $select->where('items.owner_id = ?', $userId);
-    }
-
-    /**
      * Filter SELECT statement based on items that are not tagged with a specific
      * set of tags
      *
@@ -358,67 +284,65 @@ class Table_Item extends Omeka_Db_Table
         $select->joinLeft(array('files'=>"$db->File"), 'files.item_id = items.id', array());
         $select->where('files.has_derivative_image = ?', $hasDerivativeImage);
     }
-
+    
     /**
-     * Possible options: 'public','user','featured','collection','type','tag',
-     * 'excludeTags', 'search', 'range', 'advanced', 'hasImage',
-     *
      * @param Omeka_Db_Select
      * @param array
      * @return void
      */
     public function applySearchFilters($select, $params)
     {
-        foreach ($params as $paramName => $paramValue) {
-            if ($paramValue === null || (is_string($paramValue) && trim($paramValue) == '')) {
+        $boolean = new Omeka_Filter_Boolean;
+        foreach ($params as $key => $value) {
+            if ($value === null || (is_string($value) && trim($value) == '')) {
                 continue;
             }
-
-            $boolean = new Omeka_Filter_Boolean;
-
-            switch ($paramName) {
+            switch ($key) {
                 case 'user':
-                    $this->filterByUser($select, $paramValue);
+                case 'owner':
+                case 'user_id':
+                case 'owner_id':
+                    $this->filterByUser($select, $value, 'owner_id');
                     break;
-
                 case 'public':
-                    $this->filterByPublic($select, $boolean->filter($paramValue));
+                    $this->filterByPublic($select, $boolean->filter($value));
                     break;
-
                 case 'featured':
-                    $this->filterByFeatured($select, $boolean->filter($paramValue));
+                    $this->filterByFeatured($select, $boolean->filter($value));
                     break;
-
                 case 'collection':
-                    $this->filterByCollection($select, $paramValue);
+                case 'collection_id':
+                    $this->filterByCollection($select, $value);
                     break;
-
                 case 'type':
-                    $this->filterByItemType($select, $paramValue);
+                case 'item_type':
+                case 'item_type_id':
+                    $this->filterByItemType($select, $value);
                     break;
-
                 case 'tag':
                 case 'tags':
-                    $this->filterByTags($select, $paramValue);
+                    $this->filterByTags($select, $value);
                     break;
-
                 case 'excludeTags':
-                    $this->filterByExcludedTags($select, $paramValue);
+                    $this->filterByExcludedTags($select, $value);
                     break;
-
                 case 'hasImage':
-                    $this->filterByHasDerivativeImage($select, $boolean->filter($paramValue));
+                    $this->filterByHasDerivativeImage($select, $boolean->filter($value));
                     break;
-
                 case 'range':
-                    $this->filterByRange($select, $paramValue);
+                    $this->filterByRange($select, $value);
+                    break;
+                case 'added_since':
+                    $this->filterBySince($select, $value, 'added');
+                    break;
+                case 'modified_since':
+                    $this->filterBySince($select, $value, 'modified');
                     break;
             }
         }
-
         $this->filterBySearch($select, $params);
-
-        //If we returning the data itself, we need to group by the item ID
+        
+        // If we returning the data itself, we need to group by the item ID
         $select->group('items.id');
     }
 
@@ -444,10 +368,6 @@ class Table_Item extends Omeka_Db_Table
                        ->group('items.id')
                        ->order(array("IF(ISNULL(et_sort.text), 1, 0) $sortDir",
                                      "et_sort.text $sortDir"));
-            }
-        } else {
-            if ($sortField == 'random') {
-                $select->order('RAND()');
             }
         }
     }

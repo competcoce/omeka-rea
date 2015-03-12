@@ -11,7 +11,7 @@
  * 
  * @package Omeka\Record
  */
-class File extends Omeka_Record_AbstractRecord implements Zend_Acl_Resource_Interface 
+class File extends Omeka_Record_AbstractRecord implements Zend_Acl_Resource_Interface
 {
     /**
      * Option name for whether the file validation is disabled.
@@ -350,13 +350,13 @@ class File extends Omeka_Record_AbstractRecord implements Zend_Acl_Resource_Inte
      */
     public function createDerivatives()
     {        
-        if (!($convertDir = get_option('path_to_convert'))) {
+        if (!Zend_Registry::isRegistered('file_derivative_creator')) {
             return;
         }
-        $creator = new Omeka_File_Derivative_Image_Creator($convertDir);
+        $creator = Zend_Registry::get('file_derivative_creator');
         $creator->addDerivative('fullsize', get_option('fullsize_constraint'));
         $creator->addDerivative('thumbnail', get_option('thumbnail_constraint'));
-        $creator->addDerivative('square_thumbnail', get_option('square_thumbnail_constraint'), true);
+        $creator->addDerivative('square_thumbnail', get_option('square_thumbnail_constraint'));
         if ($creator->create($this->getPath('original'), 
                              $this->getDerivativeFilename(),
                              $this->mime_type)) {
@@ -390,6 +390,7 @@ class File extends Omeka_Record_AbstractRecord implements Zend_Acl_Resource_Inte
                 $metadata[$key] = $id3->info[$key];
             }
         }
+        
         $this->metadata = json_encode($metadata);      
         return true;
     }
@@ -481,7 +482,7 @@ class File extends Omeka_Record_AbstractRecord implements Zend_Acl_Resource_Inte
         }
         return $this->_storage;
     }
-
+    
     /**
      * Get the ACL resource ID for the record.
      *
@@ -510,5 +511,15 @@ class File extends Omeka_Record_AbstractRecord implements Zend_Acl_Resource_Inte
         } else {
             return false;
         }
+    }
+
+    /**
+     * Return the representative File for the record (this File itself).
+     *
+     * @return File
+     */
+    public function getFile()
+    {
+        return $this;
     }
 }

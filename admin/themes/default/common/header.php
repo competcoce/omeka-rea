@@ -13,12 +13,12 @@
     <title><?php echo implode(' &middot; ', $titleParts); ?></title>
 
 <?php
-    queue_css_file(array('style', 'skeleton', 'jquery-ui'));
+    queue_css_file(array('iconfonts','style', 'skeleton', 'jquery-ui'));
     queue_css_file('media/960min', 'only screen and (min-width: 960px)');
     queue_css_file('media/768min', 'only screen and (min-width: 768px) and (max-width: 959px)');
     queue_css_file('media/767max', 'only screen and (max-width: 767px)');
     queue_css_file('media/479max', 'only screen and (max-width: 479px)');
-    queue_css_url('https://fonts.googleapis.com/css?family=Arvo:400,700,400italic,700italic|Cabin:400,700,400italic,700italic');
+    queue_css_url('//fonts.googleapis.com/css?family=Arvo:400,700,400italic,700italic|Cabin:400,700,400italic,700italic');
 
     queue_js_file(array('vendor/respond', 'vendor/modernizr'));
     queue_js_file('vendor/selectivizr', 'javascripts', array('conditional' => '(gte IE 6)&(lte IE 8)'));
@@ -70,14 +70,8 @@
 
     <div class="subhead">
         <?php echo search_form(array('show_advanced' => true)); ?>
-            
         <?php if (isset($title)) : ?>
-            <?php 
-                if(strlen($title) > 80) {
-                    $title = substr($title,0,79) . '..."';
-                } 
-            ?>
-            <h1 class="section-title"><?php echo $title ?></h1>
+            <h1 class="section-title" title="<?php echo html_escape($title); ?>"><?php echo $title ?></h1>
         <?php endif; ?>
     </div>
 

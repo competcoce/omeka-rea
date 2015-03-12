@@ -9,6 +9,8 @@ echo head(array('title'=>$pageTitle,'bodyclass' => 'items browse'));
     <?php echo public_nav_items(); ?>
 </nav>
 
+<?php echo item_search_filters(); ?>
+
 <?php echo pagination_links(); ?>
 
 <?php if ($total_results > 0): ?>
@@ -28,7 +30,7 @@ $sortLinks[__('Date Added')] = 'added';
 <div class="item hentry">
     <h2><?php echo link_to_item(metadata('item', array('Dublin Core', 'Title')), array('class'=>'permalink')); ?></h2>
     <div class="item-meta">
-    <?php if (metadata('item', 'has thumbnail')): ?>
+    <?php if (metadata('item', 'has files')): ?>
     <div class="item-img">
         <?php echo link_to_item(item_image('square_thumbnail')); ?>
     </div>
@@ -53,6 +55,11 @@ $sortLinks[__('Date Added')] = 'added';
 <?php endforeach; ?>
 
 <?php echo pagination_links(); ?>
+
+<div id="outputs">
+    <span class="outputs-label"><?php echo __('Output Formats'); ?></span>
+    <?php echo output_format_list(false); ?>
+</div>
 
 <?php fire_plugin_hook('public_items_browse', array('items'=>$items, 'view' => $this)); ?>
 

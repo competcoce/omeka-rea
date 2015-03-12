@@ -1,5 +1,6 @@
-# Arcaz
+# Welcome to Omeka
 
+<<<<<<< HEAD
 ### REA - Recursos Educacionais Abertos
 
 Este é o Repositório para controle de Código do projeto Arcaz - UTFPR - 2015.
@@ -11,6 +12,9 @@ Não foi feito um fork do projeto original, pois o objetivo é garantir um contr
 Disponível no README.md do Omeka
 
 &copy; 2008-2015 [Roy Rosenzweig Center for History and New Media](http://chnm.gmu.edu/)
+=======
+&copy; 2008-2012 [Roy Rosenzweig Center for History and New Media](http://chnm.gmu.edu/)
+>>>>>>> upgrade-2.2.2
 
 This program is free software: you can redistribute it and/or modify it under 
 the terms of the GNU General Public License as published by the Free Software 
